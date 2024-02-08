@@ -2,9 +2,11 @@ import React, { useContext,useEffect,useRef,useState } from 'react';
 import NoteContext from '../context/notes/NoteContext';
 import Noteitem from './Noteitem';
 import AddNote from './AddNote';
+
+
 export default function Notes() {
-    const contex = useContext(NoteContext);
-    const {notes,getNote,editNote} = contex;
+    const context = useContext(NoteContext);
+    const {notes,getNote,editNote} = context;
     useEffect(() => {
       getNote();
       // eslint-disable-next-line
@@ -67,7 +69,7 @@ export default function Notes() {
       {notes.length===0 && "No notes to display here!"}
       </div>
     {
-        notes.map((note)=>{
+      notes && notes.map((note)=>{
           return <Noteitem key = {note._id} updateNote={updateNote} note = {note}/>
         })
     }

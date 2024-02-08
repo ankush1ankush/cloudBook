@@ -1,11 +1,59 @@
 // Is puri web site ko apni ghumen ki list mai change karna hai
-import { useState } from "react";
+import { useEffect, useState  } from "react";
+import { useNavigate } from "react-router-dom";
 import NoteContext from "./NoteContext";
 const NoteState = (props)=>{
-
-  const host = "http://localhost:5000";
+   
+    const navigate=useNavigate();
+    const [user,setuser]=useState(false);
+    const host = "http://localhost:5000";
     const noteInitial = []
-      const [notes,setNotes] = useState(noteInitial);
+    const [notes,setNotes] = useState(noteInitial);
+    
+    useEffect(()=>{
+      
+        async function getuser()
+       {  
+        
+        let response;
+          if(localStorage.getItem('token')){
+            response = await fetch(`http://localhost:5000/`,{
+               method: 'GET',
+               headers: {
+                 'Content-Type': 'application/json',
+                 "auth-token": localStorage.getItem("token")
+               },
+               
+             })
+            }
+            else{
+                response = await fetch(`http://localhost:5000/`,{
+                    method: 'GET',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    
+                  })
+            }
+             const json = await response.json();
+             if(json.message==="user is Authenticated")
+             {
+               setuser(true)
+               navigate("/home")
+             }
+             if(json.message==="user is unAuthenticated")
+             {
+                navigate("/login")
+             }
+             console.log(json)
+       }
+     getuser();
+   
+     },[]);
+   
+
+     
+      
       // Add a Note
       const addNote= async(title,description,tag)=>{
         //api call
@@ -13,10 +61,10 @@ const NoteState = (props)=>{
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'auth-token':"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjJlZmJkNDAyODRjZDc2YTQ5MTU4OTBiIn0sImlhdCI6MTY1OTg4NDU1NX0.1N1EaEX5yl1JXo5sZXCd44j77VjxapQDPzH9UnzL8yw"
+            "auth-token": localStorage.getItem("token")
           },
           body:JSON.stringify({title,description,tag})
-});
+         });
       const json = await response.json();
  
 
@@ -40,11 +88,11 @@ const NoteState = (props)=>{
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'auth-token':"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjJlZmJkNDAyODRjZDc2YTQ5MTU4OTBiIn0sImlhdCI6MTY1OTg4NDU1NX0.1N1EaEX5yl1JXo5sZXCd44j77VjxapQDPzH9UnzL8yw"
-          }
+            "auth-token": localStorage.getItem("token")
+          },
         });
         const json = await response.json();
-        // console.log(json);
+         console.log(json);
         setNotes(json);
       }
       // dElete note
@@ -54,8 +102,8 @@ const NoteState = (props)=>{
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
-            'auth-token':"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjJlZmJkNDAyODRjZDc2YTQ5MTU4OTBiIn0sImlhdCI6MTY1OTg4NDU1NX0.1N1EaEX5yl1JXo5sZXCd44j77VjxapQDPzH9UnzL8yw"
-          }
+            "auth-token": localStorage.getItem("token")
+          },
         });
         const json = await response.json();
         console.log(json);
@@ -72,7 +120,7 @@ const NoteState = (props)=>{
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            'auth-token':"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjJlZmJkNDAyODRjZDc2YTQ5MTU4OTBiIn0sImlhdCI6MTY1OTg4NDU1NX0.1N1EaEX5yl1JXo5sZXCd44j77VjxapQDPzH9UnzL8yw"
+            "auth-token": localStorage.getItem("token")
           },
           
           body: JSON.stringify({title,description,tag}) 
@@ -96,7 +144,7 @@ const NoteState = (props)=>{
 
 
     return (
-        <NoteContext.Provider value = {{notes,addNote,deleteNote,editNote,getNote}}>
+        <NoteContext.Provider value = {{notes,addNote,deleteNote,editNote,getNote,user,setuser}}>
             {props.children}
         </NoteContext.Provider>
     )

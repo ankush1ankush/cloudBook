@@ -7,6 +7,7 @@ const { body, validationResult } = require('express-validator');
 const Notes = require('../models/Notes');
 
 // first router to fetch all notes from database
+
 router.get('/fetchallnotes',fetchuser,async(req,res)=>{
    try {
      
@@ -24,19 +25,43 @@ router.post('/addnote',fetchuser,[
    body('description','Enter a good and superb description of min 5 words').isLength({min:5}),
 ],async(req,res)=>{
    try {
+      if(req.isAuthenticated){
+      
       const {title,description ,tag} = req.body;
+      //console.log(req.user)
+
       // if there is any error , return bad request  and errors
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
          return res.status(400).json({ errors: errors.array() });
       }
       // console.log(errors);
+      // console.log(req.body)
       const note = new notes({
-         title,description,tag,user:req.user.id
+         title:req.body.title,description:req.body.description,tag:req.body.tag,user:req.user.id
       })
-      const savedNote = await note.save();
-      console.log(savedNote);
-      res.json(savedNote);
+
+      
+      try{
+      await note.save()
+
+      res.status(200).json({message:"note added"})
+      
+      }catch(e)
+      {
+
+        res.status(400).json({e});
+
+      }
+
+     
+
+     
+    
+       
+    
+    }
+     
    } catch (error) {
       res.status(400).send("internal server error");
    }

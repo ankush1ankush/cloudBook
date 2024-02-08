@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
-const NotesSchema = new Schema({
+
+const NoteSchema = new Schema({
     user : {
         type:mongoose.Schema.Types.ObjectId,
         ref:'user'
@@ -27,4 +28,8 @@ const NotesSchema = new Schema({
         uniqe:true
     }
 });
-module.exports=mongoose.model('notes',NotesSchema);
+
+ 
+
+
+module.exports=mongoose.model('notes',NoteSchema);

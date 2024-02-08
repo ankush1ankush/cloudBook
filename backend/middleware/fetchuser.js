@@ -5,15 +5,20 @@ const fetchuser = (req,res,next)=>{
     try{
         const token = req.header('auth-token');
         if (!token){
-            res.status(401).send({error: "please authenticate using a valid token"})
-        }
-        try {
+            req.isAuthenticated = false
+            next();
+
+           
+        }else{
+       
             const data = jwt.verify(token,JWT_SECRET);
             req.user = data.user;
+            req.isAuthenticated = true;
+            //console.log("hello");
             next();
-        } catch (error) {
-            res.status(401).send({error: "please authenticate using a valid token"})
         }
+           
+        
     } catch(error){
         console.log("error is in fetch user >>> ", error);
     }
